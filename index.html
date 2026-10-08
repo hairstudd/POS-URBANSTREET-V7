@@ -489,7 +489,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNGxjIdZ6AUxYQWrbKlKbUQnSe0gin1QuMyxcrzPj0a0nu0Ni-x8__bQyvjKT-V6BAcA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzARb0l8Rc0f8VR2LhCpqohwNXytaBO92xsHfgAYNYmzI1m3P0vrG8zsaS07E_vTWktDg/exec";
 
         // MASTER DATA
         const itemsMaster = [
@@ -869,7 +869,7 @@
                 barber: barberName,
                 customer: custName,
                 wa: custWa,
-                items: JSON.stringify(cart),
+                items: cart,
                 serviceSales: serviceSales,
                 productSales: productSales,
                 subtotal: subtotal,
@@ -880,12 +880,17 @@
                 commission: commission
             };
 
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(txRecord)
+           const payload = {
+                ...txRecord,
+                items: JSON.stringify(cart)
+            };
+
+           try {
+               await fetch(GOOGLE_SCRIPT_URL, {
+                     method: "POST",
+                     mode: "no-cors",
+                     headers: { "Content-Type": "text/plain" },
+                     body: JSON.stringify(payload) // Kirim payload
                 });
 
                 // 1. HITUNG & UPDATE DATA KUNJUNGAN PELANGGAN LOKAL
