@@ -453,7 +453,7 @@
     <div id="receipt-print-area" class="hidden print:block text-black font-mono text-xs p-2 max-w-[58mm] mx-auto">
         <div class="text-center mb-2">
             <h2 class="font-bold text-sm uppercase">Urbanstreet Hairstudio</h2>
-            <p class="text-[10px]">Jl. Bhakti VIII No.5D, Kemanggisan, Jakarta Barat</p>
+            <p class="text-[10px]">Jl. Contoh No. 123, Kota Anda</p>
             <p class="text-[10px]">==============================</p>
         </div>
 
@@ -561,10 +561,6 @@
         function authenticate() {
             const pin = document.getElementById("pin-input").value;
             const errorElement = document.getElementById("pin-error");
-            
-            // Reset status tampilan terlebih dahulu
-            document.getElementById("pos-view").classList.add("hidden");
-            document.getElementById("owner-view").classList.add("hidden");
             
             if (pin === "010101") {
                 document.getElementById("auth-modal").classList.add("hidden");
