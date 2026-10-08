@@ -559,51 +559,37 @@
 
         // AUTHENTICATION LOGIC
         function authenticate() {
-    const pin = document.getElementById("pin-input").value;
-    const errorElement = document.getElementById("pin-error");
-    
-    // Reset status tampilan terlebih dahulu
-    document.getElementById("pos-view").classList.add("hidden");
-    document.getElementById("owner-view").classList.add("hidden");
-    
-    if (pin === "010101") {
-        document.getElementById("auth-modal").classList.add("hidden");
-        document.getElementById("app-content").classList.remove("hidden");
-        document.getElementById("pos-view").classList.remove("hidden");
-        
-        const badge = document.getElementById("role-badge");
-        badge.innerText = "KASIR MODE";
-        badge.className = "ml-2 text-xs px-2.5 py-1 rounded-full font-semibold bg-blue-500 text-white";
-        
-        fetchCloudData();
-    } else if (pin === "050586") {
-        document.getElementById("auth-modal").classList.add("hidden");
-        document.getElementById("app-content").classList.remove("hidden");
-        document.getElementById("owner-view").classList.remove("hidden");
-        
-        const badge = document.getElementById("role-badge");
-        badge.innerText = "OWNER MODE";
-        badge.className = "ml-2 text-xs px-2.5 py-1 rounded-full font-semibold bg-amber-500 text-white";
-        
-        fetchCloudData();
-    } else {
-        errorElement.classList.remove("hidden");
-    }
-}
-```[cite: 14]
-
----
-
-### 2. Poin Tambahan / Rekomendasi Fitur
-* **Metode Pembayaran di Notifikasi WA:**
-  Pada fungsi `sendWhatsAppReceipt`, informasi metode pembayaran (`paymentMethod`) belum disertakan dalam format pesan teks[cite: 14]. Anda bisa menambahkan baris `Metode Pembayaran: *${txRecord.paymentMethod}*` agar pelanggan tahu pembayaran dilakukan via Cash atau QRIS[cite: 14].
-* **Keamanan PIN:**
-  PIN disimpan langsung secara *hardcoded* di JavaScript front-end (`010101` dan `050586`)[cite: 14]. Ini sudah cukup untuk penggunaan internal ringan, namun siapa saja yang membuka *Developer Tools* (F12) browser dapat melihat PIN tersebut[cite: 14]. Jika dibutuhkan keamanan lebih tinggi di kemudian hari, verifikasi PIN sebaiknya dilakukan dari sisi Google Apps Script (backend)[cite: 14].
-
----
-
-### Kesimpulan
-Kode `index13.txt` **sudah sesuai dengan alur kerja sistem POS & Dashboard Urbanstreet Hairstudio**[cite: 14]. Hanya dengan menerapkan sedikit penyesuaian pada fungsi `authenticate()` di atas, kode ini sudah sangat solid untuk langsung diimplementasikan[cite: 14].
+            const pin = document.getElementById("pin-input").value;
+            const errorElement = document.getElementById("pin-error");
+            
+            // Reset status tampilan terlebih dahulu
+            document.getElementById("pos-view").classList.add("hidden");
+            document.getElementById("owner-view").classList.add("hidden");
+            
+            if (pin === "010101") {
+                document.getElementById("auth-modal").classList.add("hidden");
+                document.getElementById("app-content").classList.remove("hidden");
+                document.getElementById("pos-view").classList.remove("hidden");
+                
+                const badge = document.getElementById("role-badge");
+                badge.innerText = "KASIR MODE";
+                badge.className = "ml-2 text-xs px-2.5 py-1 rounded-full font-semibold bg-blue-500 text-white";
+                
+                fetchCloudData();
+            } else if (pin === "050586") {
+                document.getElementById("auth-modal").classList.add("hidden");
+                document.getElementById("app-content").classList.remove("hidden");
+                document.getElementById("owner-view").classList.remove("hidden");
+                
+                const badge = document.getElementById("role-badge");
+                badge.innerText = "OWNER MODE";
+                badge.className = "ml-2 text-xs px-2.5 py-1 rounded-full font-semibold bg-amber-500 text-white";
+                
+                fetchCloudData();
+            } else {
+                errorElement.classList.remove("hidden");
+            }
+        }
 
         function logout() {
             document.getElementById("pin-input").value = "";
