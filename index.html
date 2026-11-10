@@ -1010,30 +1010,29 @@
             const dateStr = now.toISOString().split("T")[0];
 
             let serviceCommRate = 0.40;
-            if (barberName === "Heri" || currentHour >= 22 || currentHour < 10) {
+            if (barberName === "Heri" || currentHour >= 23 || currentHour < 10) {
                 serviceCommRate = 0.50;
             }
             const productCommRate = 0.20;
-            const commission = (serviceSales * serviceCommRate) + (productSales * productCommRate);
-
-            const txRecord = {
-                action: "addTransaction",
-                id: "TRX-" + Date.now(),
-                date: dateStr,
-                time: now.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }),
-                barber: barberName,
-                customer: custName,
-                wa: custWa,
-                items: cart,
-                serviceSales: serviceSales,
-                productSales: productSales,
-                subtotal: subtotal,
-                discount: discount,
-                tip: tip,
-                total: totalAmount,
-                paymentMethod: paymentMethod,
-                commission: commission
-            };
+            let commission = 0;
+            cart.forEach(item => {
+                 let itemTotal = item.price * item.qty;
+                 let itemNameLower = (item.name || "").toLowerCase();
+    
+            if (item.category === "Products") {
+                commission += itemTotal * productCommRate;
+            } else {
+            // Cek apakah layanan adalah Perming atau Cornrow
+            if (itemNameLower.includes("perming")) {
+               commission += itemTotal * 0.30; // Komisi Perming 30%
+               } else if (itemNameLower.includes("cornrow")) {
+                          commission += itemTotal * 0.60; // Komisi Cornrow 60%
+               } else {
+            // Layanan haircut / additional lainnya mengikuti tarif normal capster
+               commission += itemTotal * serviceCommRate;
+        }
+    }
+});
 
            const payload = {
                 ...txRecord,
