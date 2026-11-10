@@ -235,34 +235,62 @@
 
         <!-- OWNER DASHBOARD VIEW -->
         <main id="owner-view" class="p-4 md:p-6 max-w-7xl mx-auto space-y-6 hidden">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                 <h2 class="text-2xl font-bold text-gray-800">Dashboard Owner</h2>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-gray-500 font-medium">Periode:</span>
-                    <select id="owner-month-select" onchange="renderOwnerDashboard()" class="bg-white border rounded-lg px-3 py-1 text-xs font-semibold text-gray-700">
-                    </select>
+                
+                <!-- FILTER PERIODE BULAN & RENTANG TANGGAL KHUSUS KOMISI -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-gray-500 font-medium">Bulan:</span>
+                        <select id="owner-month-select" onchange="renderOwnerDashboard()" class="bg-gray-50 border rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700">
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- REKAP KOMISI BULANAN -->
+            <!-- KONTROL RENTANG TANGGAL KHUSUS KOMISI CAPSTER -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-4 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-bold text-sm text-blue-900 flex items-center gap-1.5">
+                        <i data-lucide="filter" class="w-4 h-4 text-blue-600"></i>
+                        <span>Filter Periode Komisi Harian Capster</span>
+                    </h3>
+                    <p class="text-xs text-blue-700 mt-0.5">Pilih rentang tanggal khusus untuk melihat rekapitulasi komisi capster (misal: minggu ke-2 tanggal 7 s.d. 14).</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600 font-medium">Dari:</span>
+                        <input type="date" id="comm-start-date" onchange="renderOwnerDashboard()" class="bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600 font-medium">S.d:</span>
+                        <input type="date" id="comm-end-date" onchange="renderOwnerDashboard()" class="bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm">
+                    </div>
+                    <button onclick="resetCommissionFilter()" class="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-3 py-1.5 rounded-lg font-medium transition shadow-sm">
+                        Reset Filter
+                    </button>
+                </div>
+            </div>
+
+            <!-- REKAP KOMISI CAPSTER (BERDASARKAN PERIODE TANGGAL TERPILIH) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-gray-500 font-medium">Komisi Bulanan: <b>Said</b></p>
+                        <p id="label-comm-said" class="text-xs text-gray-500 font-medium">Komisi Periode Ini: <b>Said</b></p>
                         <h3 id="commission-said" class="text-2xl font-bold text-gray-800 mt-1">Rp0</h3>
                     </div>
                     <div class="bg-blue-100 p-3 rounded-full text-blue-600"><i data-lucide="user-check"></i></div>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-gray-500 font-medium">Komisi Bulanan: <b>Galang</b></p>
+                        <p id="label-comm-galang" class="text-xs text-gray-500 font-medium">Komisi Periode Ini: <b>Galang</b></p>
                         <h3 id="commission-galang" class="text-2xl font-bold text-gray-800 mt-1">Rp0</h3>
                     </div>
                     <div class="bg-green-100 p-3 rounded-full text-green-600"><i data-lucide="user-check"></i></div>
                 </div>
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-gray-500 font-medium">Komisi Bulanan: <b>Heri</b></p>
+                        <p id="label-comm-heri" class="text-xs text-gray-500 font-medium">Komisi Periode Ini: <b>Heri</b></p>
                         <h3 id="commission-heri" class="text-2xl font-bold text-gray-800 mt-1">Rp0</h3>
                     </div>
                     <div class="bg-purple-100 p-3 rounded-full text-purple-600"><i data-lucide="user-check"></i></div>
@@ -580,7 +608,7 @@
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzARb0l8Rc0f8VR2LhCpqohwNXytaBO92xsHfgAYNYmzI1m3P0vrG8zsaS07E_vTWktDg/exec";
 
-        // MASTER DATA
+        // MASTER DATA (Termasuk Layanan Additional Baru: Perming 450k & Toning/Black 150k)
         const itemsMaster = [
             { id: "ITEM-001", category: "Haircuts", name: "Haircuts Only Anak", price: 35000 },
             { id: "ITEM-002", category: "Haircuts", name: "Haircuts Only Dewasa", price: 50000 },
@@ -600,11 +628,13 @@
             { id: "ITEM-016", category: "Additional", name: "Gimbal Wanita", price: 600000 },
             { id: "ITEM-017", category: "Additional", name: "Boxbraid Pria", price: 500000 },
             { id: "ITEM-018", category: "Additional", name: "Boxbraid Wanita", price: 800000 },
-            { id: "ITEM-019", category: "Products", name: "Pomade", price: 35000 },
-            { id: "ITEM-020", category: "Products", name: "Clay", price: 40000 },
-            { id: "ITEM-021", category: "Products", name: "Hair Powder", price: 35000 },
-            { id: "ITEM-022", category: "Products", name: "Hair Tonic", price: 35000 },
-            { id: "ITEM-023", category: "Products", name: "Hair Serum", price: 75000 }
+            { id: "ITEM-019", category: "Additional", name: "Perming", price: 450000 },
+            { id: "ITEM-020", category: "Additional", name: "Toning / Black", price: 150000 },
+            { id: "ITEM-021", category: "Products", name: "Pomade", price: 35000 },
+            { id: "ITEM-022", category: "Products", name: "Clay", price: 40000 },
+            { id: "ITEM-023", category: "Products", name: "Hair Powder", price: 35000 },
+            { id: "ITEM-024", category: "Products", name: "Hair Tonic", price: 35000 },
+            { id: "ITEM-025", category: "Products", name: "Hair Serum", price: 75000 }
         ];
 
         let customersDB = [
@@ -1090,6 +1120,12 @@
              }
         }
 
+        function resetCommissionFilter() {
+            document.getElementById("comm-start-date").value = "";
+            document.getElementById("comm-end-date").value = "";
+            renderOwnerDashboard();
+        }
+
         function parseStandardDate(dateInput) {
             if (!dateInput) return null;
             let str = String(dateInput).trim();
@@ -1182,6 +1218,10 @@
             const filteredTx = transactionsDB.filter(t => isSameMonth(t.date));
             const filteredExp = expensesDB.filter(e => isSameMonth(e.date));
 
+            // AMBIL NILAI FILTER RENTANG TANGGAL KHUSUS KOMISI
+            const startDateVal = document.getElementById("comm-start-date").value;
+            const endDateVal = document.getElementById("comm-end-date").value;
+
             let totalCommSaid = 0, totalCommGalang = 0, totalCommHeri = 0;
             let capsterTxCount = { Said: 0, Galang: 0, Heri: 0 };
             let itemQtyCount = {};
@@ -1197,17 +1237,30 @@
                 let txTotal = Number(tx.total || 0);
                 totalMonthlyOmzet += txTotal;
 
-                if (tx.barber === "Said") totalCommSaid += Number(tx.commission || 0);
-                if (tx.barber === "Galang") totalCommGalang += Number(tx.commission || 0);
-                if (tx.barber === "Heri") totalCommHeri += Number(tx.commission || 0);
+                // Hitung komisi bulanan / berdasarkan filter rentang tanggal
+                let parsedTxDate = parseStandardDate(tx.date);
+                let txDateFormatted = parsedTxDate ? parsedTxDate.formatted : String(tx.date || "").trim();
+
+                let includeForCommission = true;
+                if (startDateVal && endDateVal) {
+                    includeForCommission = (txDateFormatted >= startDateVal && txDateFormatted <= endDateVal);
+                } else if (startDateVal) {
+                    includeForCommission = (txDateFormatted >= startDateVal);
+                } else if (endDateVal) {
+                    includeForCommission = (txDateFormatted <= endDateVal);
+                }
+
+                if (includeForCommission) {
+                    let commVal = Number(tx.commission || 0);
+                    if (tx.barber === "Said") totalCommSaid += commVal;
+                    if (tx.barber === "Galang") totalCommGalang += commVal;
+                    if (tx.barber === "Heri") totalCommHeri += commVal;
+                }
 
                 if (tx.barber) capsterTxCount[tx.barber] = (capsterTxCount[tx.barber] || 0) + 1;
 
-                let parsed = parseStandardDate(tx.date);
-                let dateKey = parsed ? parsed.formatted : String(tx.date || "").trim();
-                
-                if (dateKey) {
-                    dailyCustomerCount[dateKey] = (dailyCustomerCount[dateKey] || 0) + 1;
+                if (txDateFormatted) {
+                    dailyCustomerCount[txDateFormatted] = (dailyCustomerCount[txDateFormatted] || 0) + 1;
                 }
 
                 if (tx.time) {
@@ -1236,11 +1289,17 @@
                 });
             });
 
-            document.getElementById("kpi-monthly-omzet").innerText = `Rp${totalMonthlyOmzet.toLocaleString("id-ID")}`;
+            // Update Label & Nilai Komisi di Kartu UI
+            let periodLabelText = (startDateVal || endDateVal) ? `Periode (${startDateVal || 'Awal'} s.d. ${endDateVal || 'Akhir'})` : `Bulan Berjalan (${selectedMonth})`;
+            document.getElementById("label-comm-said").innerHTML = `Komisi ${periodLabelText}: <b>Said</b>`;
+            document.getElementById("label-comm-galang").innerHTML = `Komisi ${periodLabelText}: <b>Galang</b>`;
+            document.getElementById("label-comm-heri").innerHTML = `Komisi ${periodLabelText}: <b>Heri</b>`;
 
             document.getElementById("commission-said").innerText = `Rp${totalCommSaid.toLocaleString("id-ID")}`;
             document.getElementById("commission-galang").innerText = `Rp${totalCommGalang.toLocaleString("id-ID")}`;
             document.getElementById("commission-heri").innerText = `Rp${totalCommHeri.toLocaleString("id-ID")}`;
+
+            document.getElementById("kpi-monthly-omzet").innerText = `Rp${totalMonthlyOmzet.toLocaleString("id-ID")}`;
 
             document.getElementById("qty-haircuts").innerText = `${qtyHaircuts} Item`;
             document.getElementById("qty-additional").innerText = `${qtyAdditional} Item`;
@@ -1360,7 +1419,7 @@
             });
         }
 
-        // PERBAIKAN: MODAL KHUSUS DAFTAR OMZET HARIAN PER TANGGAL (KETIKA DIKLIK "TOTAL OMZET BULAN BERJALAN")
+        // MODAL KHUSUS DAFTAR OMZET HARIAN PER TANGGAL (KETIKA DIKLIK "TOTAL OMZET BULAN BERJALAN")
         function openMonthlyOmzetModal() {
             const selectElem = document.getElementById("owner-month-select");
             const selectedMonth = selectElem ? selectElem.value : "";
@@ -1400,7 +1459,7 @@
                     tr.className = "hover:bg-gray-50 cursor-pointer";
                     tr.onclick = () => {
                         closeMonthlyOmzetModal();
-                        openDailyDetailModal(date); // Bisa langsung lihat rincian transaksi tanggal tersebut
+                        openDailyDetailModal(date);
                     };
                     tr.innerHTML = `
                         <td class="p-2 font-bold text-gray-800">${date}</td>
@@ -1418,7 +1477,7 @@
             document.getElementById("monthly-omzet-modal").classList.add("hidden");
         }
 
-        // PERBAIKAN: MEMASTIKAN KATEGORI ITEM COCOK DENGAN MASTER DATA (HAIRCUTS / ADDITIONAL / PRODUCTS)
+        // MEMASTIKAN KATEGORI ITEM COCOK DENGAN MASTER DATA (HAIRCUTS / ADDITIONAL / PRODUCTS)
         function openCategoryDetailModal(categoryName) {
             const selectElem = document.getElementById("owner-month-select");
             const selectedMonth = selectElem ? selectElem.value : "";
@@ -1444,7 +1503,6 @@
                     let qty = Number(item.qty || 1);
                     let price = Number(item.price || 0);
 
-                    // Cari kategori valid langsung dari Master Data agar tidak salah tangkap
                     let masterMatch = itemsMaster.find(m => m.name.toLowerCase() === itemName.toLowerCase());
                     let cat = masterMatch ? masterMatch.category : (item.category || "");
 
