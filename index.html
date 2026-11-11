@@ -975,7 +975,7 @@
         }
 
         // SUBMIT TRANSAKSI DENGAN KOMISI PRODUK 20%
-        async function submitTransaction() {
+     async function submitTransaction() {
             if (cart.length === 0) {
                 alert("Keranjang belanja masih kosong!");
                 return;
@@ -1015,36 +1015,56 @@
             }
             const productCommRate = 0.20;
             let commission = 0;
-            cart.forEach(item => {
-                 let itemTotal = item.price * item.qty;
-                 let itemNameLower = (item.name || "").toLowerCase();
-    
-            if (item.category === "Products") {
-                commission += itemTotal * productCommRate;
-            } else {
-            // Cek apakah layanan adalah Perming atau Cornrow
-            if (itemNameLower.includes("perming")) {
-               commission += itemTotal * 0.30; // Komisi Perming 30%
-               } else if (itemNameLower.includes("cornrow")) {
-                          commission += itemTotal * 0.60; // Komisi Cornrow 60%
-               } else {
-            // Layanan haircut / additional lainnya mengikuti tarif normal capster
-               commission += itemTotal * serviceCommRate;
-        }
-    }
-});
 
-           const payload = {
+            // Hitung komisi per item di keranjang dengan benar
+            cart.forEach(item => {
+                let itemTotal = item.price * item.qty;
+                let itemNameLower = (item.name || "").toLowerCase();
+    
+                if (item.category === "Products") {
+                    commission += itemTotal * productCommRate;
+                } else {
+                    if (itemNameLower.includes("perming")) {
+                        commission += itemTotal * 0.30; // Komisi Perming 30%
+                    } else if (itemNameLower.includes("cornrow")) {
+                        commission += itemTotal * 0.60; // Komisi Cornrow 60%
+                    } else {
+                        commission += itemTotal * serviceCommRate; // Tarif standar / lembur
+                    }
+                }
+            });
+
+            // Deklarasi txRecord secara lengkap di sini agar tidak undefined
+            const txRecord = {
+                action: "addTransaction",
+                id: "TRX-" + Date.now(),
+                date: dateStr,
+                time: now.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }),
+                barber: barberName,
+                customer: custName,
+                wa: custWa,
+                items: cart,
+                serviceSales: serviceSales,
+                productSales: productSales,
+                subtotal: subtotal,
+                discount: discount,
+                tip: tip,
+                total: totalAmount,
+                paymentMethod: paymentMethod,
+                commission: commission
+            };
+
+            const payload = {
                 ...txRecord,
                 items: JSON.stringify(cart)
             };
 
-           try {
-               await fetch(GOOGLE_SCRIPT_URL, {
-                     method: "POST",
-                     mode: "no-cors",
-                     headers: { "Content-Type": "text/plain" },
-                     body: JSON.stringify(payload)
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
                 });
 
                 let custIndex = document.getElementById("customer-dropdown").value;
@@ -1095,6 +1115,7 @@
                 await fetchCloudData();
 
             } catch (err) {
+                console.error("Gagal menyimpan transaksi:", err);
                 alert("Gagal menyimpan transaksi.");
             } finally {
                 btn.disabled = false;
@@ -1102,7 +1123,6 @@
                 lucide.createIcons();
             }
         }
-
         function setupMonthOptions() {
              const select = document.getElementById("owner-month-select");
              if (!select) return;
